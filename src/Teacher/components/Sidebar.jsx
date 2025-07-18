@@ -82,7 +82,7 @@ export default function Sidebar({ teacherName }) {
                 <NavItem 
                   icon={<FiBook />} 
                   onClick={() => {
-                    navigate("/createquiz");
+                    
                     setIsMobileMenuOpen(false);
                   }}
                 >

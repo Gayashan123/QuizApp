@@ -39,6 +39,7 @@ export default function TeacherHome() {
     notifications
   } = dummyData;
 
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex">
       <Sidebar teacherName={teacherName} />
