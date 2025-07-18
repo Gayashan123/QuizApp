@@ -185,7 +185,7 @@ export default function CreateQuiz() {
                       color: "#94a3b8"
                     }
                   }}
-                >
+                >a
                   Publish Quiz
                 </Button>
               ) : (

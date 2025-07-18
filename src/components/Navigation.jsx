@@ -49,7 +49,7 @@ function Navigation() {
             onClick={() => navigate("/loginpage")}
             className="ml-6 px-6 py-2 rounded-full bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-300 shadow-md"
           >
-            Logout
+           Log Menu
           </button>
         </nav>
 
@@ -59,7 +59,7 @@ function Navigation() {
             onClick={() => navigate("/loginpage")}
             className="px-5 py-2 rounded-full bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-300 shadow-md"
           >
-            Logout
+       Log Menu
           </button>
 
           <button
