@@ -1,18 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Container,
-  Stepper,
-  Step,
-  StepLabel,
-  Paper,
-  Snackbar,
-  Alert,
-  Button
-} from "@mui/material";
-import { Save } from "@mui/icons-material";
-
+import { Save, Home } from "lucide-react"; // Or keep MUI icons if needed
 import TopNav from "../components/TopNav";
 import Sidebar from "../components/Sidebar";
 import QuizDetailsStep from "../components/QuizDetailsStep";
@@ -24,12 +12,6 @@ const steps = ["Quiz Details", "Add Questions", "Review & Publish"];
 export default function CreateQuiz() {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success"
-  });
-
   const [quiz, setQuiz] = useState({
     title: "",
     subject: "",
@@ -42,12 +24,11 @@ export default function CreateQuiz() {
     pdfFile: null
   });
 
-  const showSnackbar = (message, severity) => {
-    setSnackbar({
-      open: true,
-      message,
-      severity
-    });
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+    setTimeout(() => setSnackbar({ open: false, message: "", severity: "success" }), 5000);
   };
 
   const handleNext = () => {
@@ -55,17 +36,16 @@ export default function CreateQuiz() {
       showSnackbar("Please fill in all required quiz details", "error");
       return;
     }
-    if (activeStep === 1 && tabValue === 0 && quiz.questions.length === 0) {
-  showSnackbar("Please add at least one question", "error");
-  return;
-}
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if (activeStep === 1 && quiz.questions.length === 0) {
+      showSnackbar("Please add at least one question", "error");
+      return;
+    }
+
+    setActiveStep((prev) => prev + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const submitQuiz = async () => {
     if (
@@ -80,136 +60,102 @@ export default function CreateQuiz() {
       showSnackbar("Please fill all fields and add at least one question", "error");
       return;
     }
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("Quiz submitted:", quiz);
+      await new Promise((res) => setTimeout(res, 1000));
       showSnackbar("Quiz published successfully!", "success");
       navigate("/teacher/dashboard");
-    } catch (e) {
+    } catch {
       showSnackbar("Failed to create quiz. Please try again.", "error");
     }
   };
 
   return (
-    <Box sx={{ display: "flex", bgcolor: "#f5f8fc", minHeight: "100vh" }}>
-      <Sidebar teacherName="Teacher" />
-      <Box sx={{ flex: 1, minHeight: "100vh" }}>
-        
-        
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert severity={snackbar.severity}>
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar if needed */}
+      {/* <Sidebar /> */}
+
+      <div className="flex-1 min-h-screen">
+        {/* Snackbar */}
+        {snackbar.open && (
+          <div className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-md text-white shadow-lg
+            ${snackbar.severity === "error" ? "bg-red-500" : "bg-green-500"}`}>
             {snackbar.message}
-          </Alert>
-        </Snackbar>
+          </div>
+        )}
 
-        <Container maxWidth="md" sx={{ pt: 6, pb: 4 }}>
-          <Paper
-            elevation={4}
-            sx={{
-              borderRadius: 5,
-              p: { xs: 2, md: 4 },
-              background: "white",
-              mt: 2,
-              boxShadow: "0 4px 20px rgba(0,0,30,0.1)",
-            }}
-          >
-            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel sx={{ '& .MuiStepLabel-label': { fontWeight: 600 } }}>
-                    {label}
-                  </StepLabel>
-                </Step>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="bg-white rounded-3xl shadow-md p-6 md:p-10 mt-4">
+            {/* Home Button */}
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => navigate("/home")}
+                className="flex items-center border-2 border-gray-300 hover:border-gray-500 text-sm font-semibold rounded-lg px-4 py-2"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </button>
+            </div>
+
+            {/* Stepper */}
+            <div className="flex justify-between mb-8">
+              {steps.map((label, index) => (
+                <div
+                  key={label}
+                  className={`flex-1 text-center text-sm font-semibold transition
+                    ${index === activeStep ? "text-indigo-600" : "text-gray-400"}`}
+                >
+                  <div
+                    className={`w-4 h-4 mx-auto rounded-full mb-1
+                      ${index <= activeStep ? "bg-indigo-600" : "bg-gray-300"}`}
+                  ></div>
+                  {label}
+                </div>
               ))}
-            </Stepper>
+            </div>
 
+            {/* Step Content */}
             {activeStep === 0 && (
-              <QuizDetailsStep 
-                quiz={quiz} 
-                setQuiz={setQuiz} 
-                showSnackbar={showSnackbar} 
-              />
+              <QuizDetailsStep quiz={quiz} setQuiz={setQuiz} showSnackbar={showSnackbar} />
             )}
-
             {activeStep === 1 && (
-              <AddQuestionsStep 
-                quiz={quiz} 
-                setQuiz={setQuiz} 
-                showSnackbar={showSnackbar} 
-              />
+              <AddQuestionsStep quiz={quiz} setQuiz={setQuiz} showSnackbar={showSnackbar} />
             )}
-
             {activeStep === 2 && <ReviewStep quiz={quiz} />}
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-              <Button
-                variant="outlined"
+            {/* Buttons */}
+            <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
+              <button
                 onClick={handleBack}
                 disabled={activeStep === 0}
-                sx={{
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  borderWidth: 2,
-                  "&:hover": { borderWidth: 2 }
-                }}
+                className="px-6 py-2 border-2 border-gray-300 rounded-lg font-semibold
+                  disabled:opacity-50 hover:border-gray-500 transition"
               >
                 Back
-              </Button>
-              
+              </button>
+
               {activeStep === steps.length - 1 ? (
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<Save />}
+                <button
                   onClick={submitQuiz}
-                  sx={{
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    background: "linear-gradient(90deg, #10b981 0%, #34d399 100%)",
-                    "&:hover": {
-                      background: "linear-gradient(90deg, #059669 0%, #10b981 100%)"
-                    },
-                    "&:disabled": {
-                      background: "#e2e8f0",
-                      color: "#94a3b8"
-                    }
-                  }}
-                >a
+                  className="flex items-center justify-center px-6 py-2 text-white font-semibold rounded-lg
+                    bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 transition"
+                >
+                  <Save className="w-4 h-4 mr-2" />
                   Publish Quiz
-                </Button>
+                </button>
               ) : (
-                <Button
-                  variant="contained"
+                <button
                   onClick={handleNext}
-                  sx={{
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    background: "linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%)",
-                    "&:hover": {
-                      background: "linear-gradient(90deg, #4338ca 0%, #6d28d9 100%)"
-                    }
-                  }}
+                  className="px-6 py-2 text-white font-semibold rounded-lg
+                    bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600 transition"
                 >
                   Continue
-                </Button>
+                </button>
               )}
-            </Box>
-          </Paper>
-        </Container>
-      </Box>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
